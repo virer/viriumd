@@ -52,7 +52,6 @@ func createVolumeHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "LVM create failed", http.StatusInternalServerError)
 		return
 	}
-
 	log.Println("LVM volume created:", volumeName)
 
 	createISCSITarget(volumeName)

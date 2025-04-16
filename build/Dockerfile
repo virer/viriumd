@@ -7,10 +7,10 @@ RUN go mod download
 
 COPY *.go ./
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /virium
+RUN CGO_ENABLED=0 GOOS=linux go build -o /viriumd
 
 EXPOSE 8787
 ENV VG_NAME vg_data
 
 # Run
-CMD ["/virium"]
+CMD ["/viriumd"]

@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os/exec"
 )
 
 func createISCSITarget(volumeName string) error {
 	vgPath := fmt.Sprintf("/dev/%s/%s", config.VGName, volumeName)
+	log.Println("iSCSI configuration for ", volumeName)
 
 	iqn := fmt.Sprintf("iqn.2025-04.local.virium:%s", volumeName) // XXX FIXME date
 
@@ -16,11 +18,15 @@ func createISCSITarget(volumeName string) error {
 		return fmt.Errorf("failed to create backstore: %s", err)
 	}
 
+	log.Println("iSCSI backstore created: ", volumeName)
+
 	// Create target
 	err = exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/ create %s", iqn))
 	if err != nil {
 		return fmt.Errorf("failed to create iSCSI target: %s", err)
 	}
+
+	log.Println("iSCSI target created: ", volumeName)
 
 	// Create LUN
 	err = exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/%s/tpg1/luns/ create /backstores/block/%s", iqn, volumeName))
@@ -28,11 +34,15 @@ func createISCSITarget(volumeName string) error {
 		return fmt.Errorf("failed to create LUN: %s", err)
 	}
 
+	log.Println("iSCSI lun created: ", volumeName)
+
 	// Enable TPG1 and allow all initiators (simple setup; improve for prod!)
 	err = exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/%s/tpg1/acls/ create iqn.fake.initiator", iqn))
 	if err != nil {
 		return fmt.Errorf("failed to create ACL: %s", err)
 	}
+
+	log.Println("iSCSI initiator created: ", volumeName)
 
 	return nil
 }
