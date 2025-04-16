@@ -6,60 +6,66 @@ import (
 	"os/exec"
 )
 
-func createISCSITarget(volumeName string) error {
+func createISCSITarget(volumeName string, volumeInitiator string) error {
 	vgPath := fmt.Sprintf("/dev/%s/%s", config.VGName, volumeName)
-	log.Println("iSCSI configuration for ", volumeName)
+	log.Println("iSCSI configuration for", volumeName)
 
-	iqn := fmt.Sprintf("iqn.2025-04.local.virium:%s", volumeName) // XXX FIXME date
+	iqn := fmt.Sprintf("%s:%s", config.Base_iqn, volumeName)
 
 	// Create backstore
-	err := exec.Command("sudo", "targetcli", fmt.Sprintf("backstores/block create name=%s dev=%s", volumeName, vgPath))
+	iscsicreate := exec.Command("sudo", "targetcli", fmt.Sprintf("backstores/block create name=%s dev=%s", volumeName, vgPath))
+	out, err := iscsicreate.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("failed to create backstore: %s", err)
+		return fmt.Errorf("failed to create backstore: %s %s", err, out)
 	}
 
 	log.Println("iSCSI backstore created: ", volumeName)
 
 	// Create target
-	err = exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/ create %s", iqn))
+	iscsicreate = exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/ create %s", iqn))
+	out, err = iscsicreate.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("failed to create iSCSI target: %s", err)
+		return fmt.Errorf("failed to create iSCSI target: %s %s", err, out)
 	}
 
 	log.Println("iSCSI target created: ", volumeName)
 
 	// Create LUN
-	err = exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/%s/tpg1/luns/ create /backstores/block/%s", iqn, volumeName))
+	iscsicreate = exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/%s/tpg1/luns/ create /backstores/block/%s", iqn, volumeName))
+	out, err = iscsicreate.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("failed to create LUN: %s", err)
+		return fmt.Errorf("failed to create LUN: %s %s", err, out)
 	}
 
 	log.Println("iSCSI lun created: ", volumeName)
 
-	// Enable TPG1 and allow all initiators (simple setup; improve for prod!)
-	err = exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/%s/tpg1/acls/ create iqn.fake.initiator", iqn))
+	// Enable TPG1 and allow all initiators ; simple setup improve for prod! XXX FIXME XXX
+	iscsicreate = exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/%s/tpg1/acls/ create %s", iqn, volumeInitiator))
+	out, err = iscsicreate.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("failed to create ACL: %s", err)
+		return fmt.Errorf("failed to create ACL: %s %s", err, out)
 	}
 
-	log.Println("iSCSI initiator created: ", volumeName)
+	log.Println("iSCSI configuration done for: ", volumeName)
 
 	return nil
 }
 
 func deleteISCSITarget(volumeName string) error {
-	iqn := fmt.Sprintf("iqn.2025-04.local.virium:%s", volumeName) // XXX FIXME date
+	iqn := fmt.Sprintf("%s:%s", config.Base_iqn, volumeName)
 
 	// Delete iSCSI target — this removes LUNs and backstore link
-	err := exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi delete %s", iqn))
+	iscsidel := exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/ delete %s", iqn))
+	out, err := iscsidel.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("failed to delete iSCSI target: %s", err)
+		return fmt.Errorf("failed to delete iSCSI target: %s %s", err, out)
 	}
 
 	// Delete backstore
-	err = exec.Command("sudo", "targetcli", fmt.Sprintf("backstores/block delete %s", volumeName))
+	iscsidel = exec.Command("sudo", "targetcli", fmt.Sprintf("backstores/block delete name=%s", volumeName))
+	out, err = iscsidel.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("failed to delete backstore: %s", err)
+		return fmt.Errorf("failed to delete backstore: %s %s", err, out)
 	}
 
 	return nil

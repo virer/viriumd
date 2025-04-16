@@ -1,95 +1,50 @@
 package main
 
 import (
-	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"os/exec"
-
-	"github.com/google/uuid"
+	"regexp"
 )
 
-type VolumeRequest struct {
-	Name     string `json:"name"`
-	Capacity int64  `json:"capacity"` // bytes
-}
-
-type VolumeResponse struct {
-	ID string `json:"id"`
-}
-
-type DeleteVolumeRequest struct {
-	VolumeID string `json:"volume id"`
-}
-
-type Config struct {
-	VGName string `json:"vg_name"`
-}
-
 var config Config
+var version string = "0.1.0"
+var validNamePattern = regexp.MustCompile(`^[a-zA-Z0-9._-]+$`)
 
-func createVolumeHandler(w http.ResponseWriter, r *http.Request) {
-	var req VolumeRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "invalid request", http.StatusBadRequest)
-		return
-	}
-
-	// LVM: Create logical volume
-	lvmsize := req.Capacity / (1024 * 1024)
-	// volumeName := req.Name
-	volumeName := "virium-vol-" + uuid.New().String()
-	volumeGroup := config.VGName
-
-	log.Printf("Creating %d MiB volumeID: %s in volumeGroup %s", lvmsize, volumeName, volumeGroup)
-
-	lvCreateCmd := exec.Command("sudo", "lvcreate", "-L", fmt.Sprintf("%dM", lvmsize), "-n", volumeName, volumeGroup)
-	out, err := lvCreateCmd.CombinedOutput()
-	if err != nil {
-		log.Printf("lvcreate error: %v\n%s", err, out)
-		http.Error(w, "LVM create failed", http.StatusInternalServerError)
-		return
-	}
-	log.Println("LVM volume created:", volumeName)
-
-	createISCSITarget(volumeName)
-
-	json.NewEncoder(w).Encode(VolumeResponse{ID: volumeName})
-}
-
-func deleteVolumeHandler(w http.ResponseWriter, r *http.Request) {
-	var req DeleteVolumeRequest
-	volumeID := req.VolumeID
-	volumeGroup := config.VGName
-
-	log.Printf("Removing volumeID: %s in volumeGroup %s", volumeID, volumeGroup)
-
-	// Remove iSCSI export first
-	deleteISCSITarget(volumeID)
-
-	// LVM: Remove logical volume
-	lvRemoveCmd := exec.Command("sudo", "lvremove", "-y", fmt.Sprintf("%s/%s", volumeGroup, volumeID))
-	out, err := lvRemoveCmd.CombinedOutput()
-	if err != nil {
-		log.Printf("lvremove error: %v\n%s", err, out)
-		http.Error(w, "LVM delete failed", http.StatusInternalServerError)
-		return
-	}
-
-	log.Println("LVM volume deleted:", volumeID)
-	w.WriteHeader(http.StatusNoContent)
+func isValidInput(s string) bool {
+	return validNamePattern.MatchString(s)
 }
 
 func main() {
-	config.VGName = os.Getenv("VG_DATA")
+	var err error
+	configPath := flag.String("config", "/etc/virium/virium.yaml", "Path to configuration file")
+	flag.Parse()
+
+	config, err = LoadConfigFromFile(*configPath)
+	if err != nil {
+		log.Fatalf("Failed to load config: %v", err)
+	}
+	// fmt.Printf("Config loaded: %+v\n", config)
+
 	if config.VGName == "" {
 		config.VGName = "vg_data"
 	}
+	if config.Port == "" {
+		config.Port = "8787"
+	}
+	if config.Base_iqn == "" {
+		config.Base_iqn = "iqn.2025-04.net.virer.virium"
+	}
+
+	log.Printf("Starting virium on port %s using vol:%s (v%s)", config.Port, config.VGName, version)
 
 	http.HandleFunc("/api/volumes/create", createVolumeHandler)
 	http.HandleFunc("/api/volumes/delete", deleteVolumeHandler)
+	http.HandleFunc("/api/volumes/resize", resizeVolumeHandler)
 
-	http.ListenAndServe(":8787", nil)
+	http.HandleFunc("/api/snapshoft/create", createSnapshotHandler)
+	http.HandleFunc("/api/snapshoft/delete", deleteSnapshotHandler)
+
+	http.ListenAndServe(fmt.Sprintf(":%s", config.Port), nil)
 }

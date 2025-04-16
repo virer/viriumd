@@ -16,18 +16,20 @@ $ CGO_ENABLED=0 GOOS=linux go build -o tmp/viriumd
 
 ## Usage:
 
-$ export VG_NAME=vg_data
-$ ./viriumd
+$ ./viriumd /path/to/config/file
 
 ## Example
 
+### Configure LVM
+$ sed -i 's/\(.*\)# snapshot_autoextend_threshold = 70/\1snapshot_autoextend_threshold = 70/g' /etc/lvm/lvm.conf 
+
 ### Create volume
-curl -X POST http://localhost:8787/api/volumes/create \
+$ curl -X POST http://localhost:8787/api/volumes/create \
   -H "Content-Type: application/json" \
-  -d '{"name":"test-vol","capacity":10737418240}' # 10 GiB
+  -d '{"initiator_name":"iqn.2025-04.net.virer.virium.test","capacity":10737418240}' # 10 GiB
 
 # Delete volume
-curl -X DELETE http://localhost:8787/api/volumes/delete \
+$ curl -X DELETE http://localhost:8787/api/volumes/delete \
     -H "Content-Type: application/json" \
-    -d '{"VolumeID":"test-vol"}'
+    -d '{"id":"000-000-0000-000"}'
 
