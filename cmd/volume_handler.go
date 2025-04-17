@@ -113,5 +113,6 @@ func resizeVolumeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("LVM volume extended:", volumeName)
 
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(VolumeResponse{VolumeID: volumeID})
 }

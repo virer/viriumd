@@ -39,6 +39,7 @@ func createSnapshotHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("LVM snapshot created:", req.VolumeID)
 
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(SnapshotRequest{VolumeID: snapshotID})
 }
 
