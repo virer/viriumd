@@ -58,14 +58,6 @@ func deleteSnapshotHandler(w http.ResponseWriter, r *http.Request) {
 	snapshotName := "virium-snap-" + req.VolumeID
 	log.Printf("Removing snapshot ID: %s in volumeGroup %s", snapshotName, config.VGName)
 
-	// Remove iSCSI export first
-	err := deleteISCSITarget(req.VolumeID)
-	if err != nil {
-		log.Printf("iSCSI error: %s", err)
-		http.Error(w, "iSCSI error", http.StatusInternalServerError)
-		return
-	}
-
 	// LVM: Remove logical volume
 	lvRemoveCmd := exec.Command("sudo", "lvremove", "-y", fmt.Sprintf("%s/%s", config.VGName, snapshotName))
 	out, err := lvRemoveCmd.CombinedOutput()

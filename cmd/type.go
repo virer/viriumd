@@ -10,7 +10,10 @@ type VolumeResizeRequest struct {
 }
 
 type VolumeResponse struct {
-	VolumeID string `json:"id"`
+	VolumeID     string `json:"id"`
+	TargetPortal string `json:"targetPortal"`
+	Iqn          string `json:"iqn"`
+	Lun          string `json:"lun"`
 }
 
 type DeleteVolumeRequest struct {
@@ -26,7 +29,8 @@ type DeleteSnapshotRequest struct {
 }
 
 type Config struct {
-	VGName   string `yaml:"vg_name"`
-	Port     string `yaml:"port"`
-	Base_iqn string `yaml:"iqn"`
+	VGName       string `yaml:"vg_name"`
+	Port         string `yaml:"port"`
+	Base_iqn     string `yaml:"iqn"`
+	TargetPortal string `yaml:"target_portal"`
 }

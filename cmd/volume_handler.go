@@ -38,7 +38,7 @@ func createVolumeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("LVM volume created:", volumeName)
 
-	err = createISCSITarget(volumeID, volumeName, req.InitiatorName)
+	iqn, err := createISCSITarget(volumeID, volumeName, req.InitiatorName)
 	if err != nil {
 		log.Printf("iSCSI error: %s", err)
 		http.Error(w, "iSCSI error", http.StatusInternalServerError)
@@ -46,7 +46,7 @@ func createVolumeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(VolumeResponse{VolumeID: volumeID})
+	json.NewEncoder(w).Encode(VolumeResponse{VolumeID: volumeID, TargetPortal: config.TargetPortal, Iqn: string(iqn), Lun: "0"})
 }
 
 func deleteVolumeHandler(w http.ResponseWriter, r *http.Request) {
@@ -61,11 +61,11 @@ func deleteVolumeHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid ID name format", http.StatusBadRequest)
 		return
 	}
-
-	log.Printf("Removing volumeID: %s in volumeGroup %s", req.VolumeID, config.VGName)
+	volumeName := "virium-vol-" + req.VolumeID
+	log.Printf("Removing volumeID: %s in volumeGroup %s", volumeName, config.VGName)
 
 	// Remove iSCSI export first
-	err := deleteISCSITarget(req.VolumeID)
+	err := deleteISCSITarget(req.VolumeID, volumeName)
 	if err != nil {
 		log.Printf("iSCSI error: %s", err)
 		http.Error(w, "iSCSI error", http.StatusInternalServerError)
@@ -73,7 +73,7 @@ func deleteVolumeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// LVM: Remove logical volume
-	lvRemoveCmd := exec.Command("sudo", "lvremove", "-y", fmt.Sprintf("%s/%s", config.VGName, req.VolumeID))
+	lvRemoveCmd := exec.Command("sudo", "lvremove", "-y", fmt.Sprintf("%s/%s", config.VGName, volumeName))
 	out, err := lvRemoveCmd.CombinedOutput()
 	if err != nil {
 		log.Printf("lvremove error: %v\n%s", err, out)
