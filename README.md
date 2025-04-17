@@ -1,7 +1,7 @@
 # Virium
 
 Virium is a storage API built on top of LVM(Logical volume management) and iSCSI(Internet Small Computer Systems Interface) using targetcli-fb.
-Virum is not scalable, nor highly-available* storage solution
+Virum is not scalable, nor a highly-available* storage solution
 
 *a more or less HA solution would be possible using Linbit DRBD and a virtual IP using keepalived with VRRP protocol.
 
@@ -31,5 +31,5 @@ $ curl -X POST http://localhost:8787/api/volumes/create \
 # Delete volume
 $ curl -X DELETE http://localhost:8787/api/volumes/delete \
     -H "Content-Type: application/json" \
-    -d '{"id":"000-000-0000-000"}'
+    -d '{"id":"47eb27cd-6824-4977-90fc-c62a21b11dfb"}'
 

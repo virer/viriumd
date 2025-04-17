@@ -38,7 +38,7 @@ func createVolumeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("LVM volume created:", volumeName)
 
-	err = createISCSITarget(volumeName, req.InitiatorName)
+	err = createISCSITarget(volumeID, volumeName, req.InitiatorName)
 	if err != nil {
 		log.Printf("iSCSI error: %s", err)
 		http.Error(w, "iSCSI error", http.StatusInternalServerError)

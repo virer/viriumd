@@ -6,11 +6,11 @@ import (
 	"os/exec"
 )
 
-func createISCSITarget(volumeName string, volumeInitiator string) error {
+func createISCSITarget(volumeID string, volumeName string, volumeInitiator string) error {
 	vgPath := fmt.Sprintf("/dev/%s/%s", config.VGName, volumeName)
 	log.Println("iSCSI configuration for", volumeName)
 
-	iqn := fmt.Sprintf("%s:%s", config.Base_iqn, volumeName)
+	iqn := fmt.Sprintf("%s:%s", config.Base_iqn, volumeID)
 
 	// Create backstore
 	iscsicreate := exec.Command("sudo", "targetcli", fmt.Sprintf("backstores/block create name=%s dev=%s", volumeName, vgPath))
@@ -38,14 +38,19 @@ func createISCSITarget(volumeName string, volumeInitiator string) error {
 	}
 
 	log.Println("iSCSI lun created: ", volumeName)
+	// Attribute
+	iscsicreate = exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/%s/tpg1/", iqn), "set", "attribute", "generate_node_acls=1")
+	out, err = iscsicreate.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("failed to set attributes: %s %s", err, out)
+	}
 
-	// Enable TPG1 and allow all initiators ; simple setup improve for prod! XXX FIXME XXX
+	// Enable TPG1 and ACL to allow initiator to R/W access (default)
 	iscsicreate = exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/%s/tpg1/acls/ create %s", iqn, volumeInitiator))
 	out, err = iscsicreate.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("failed to create ACL: %s %s", err, out)
 	}
-
 	log.Println("iSCSI configuration done for: ", volumeName)
 
 	return nil
