@@ -9,7 +9,7 @@ import (
 )
 
 var config Config
-var version string = "0.1.0"
+var version string = "v0.1.1"
 var validNamePattern = regexp.MustCompile(`^[a-zA-Z0-9.:-]+$`)
 
 func isValidInput(s string) bool {
@@ -37,7 +37,7 @@ func main() {
 		config.Base_iqn = "iqn.2025-04.net.virer.virium"
 	}
 
-	log.Printf("Starting virium on port %s using vol:%s (v%s)", config.Port, config.VGName, version)
+	log.Printf("Starting virium on port %s using vol:%s (%s)", config.Port, config.VGName, version)
 
 	http.HandleFunc("/api/volumes/create", createVolumeHandler)
 	http.HandleFunc("/api/volumes/delete", deleteVolumeHandler)
