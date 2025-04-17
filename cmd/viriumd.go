@@ -9,7 +9,7 @@ import (
 )
 
 var config Config
-var version string = "v0.1.1"
+var version string = "v0.1.2"
 var validNamePattern = regexp.MustCompile(`^[a-zA-Z0-9.:-]+$`)
 
 func isValidInput(s string) bool {
