@@ -45,6 +45,12 @@ func createISCSITarget(volumeID string, volumeName string, volumeInitiator strin
 	if err != nil {
 		return nil, fmt.Errorf("failed to set attributes: %s %s", err, out)
 	}
+	// Write protection off
+	iscsicreate = exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/%s/tpg1/", iqn), "set", "attribute", "demo_mode_write_protect=0")
+	out, err = iscsicreate.CombinedOutput()
+	if err != nil {
+		return nil, fmt.Errorf("failed to set attributes: %s %s", err, out)
+	}
 
 	// Enable TPG1 and ACL to allow initiator to R/W access (default)
 	iscsicreate = exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/%s/tpg1/acls/ create %s", iqn, volumeInitiator))
