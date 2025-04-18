@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"strings"
 )
 
 func createISCSITarget(volumeID string, volumeName string, volumeInitiator string) ([]byte, error) {
@@ -63,14 +64,22 @@ func deleteISCSITarget(volumeID, volumeName string) error {
 	iscsidel := exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/ delete %s", iqn))
 	out, err := iscsidel.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("failed to delete iSCSI target: %s %s", err, out)
+		if strings.HasPrefix(string(out), "No such Target in configfs") {
+			fmt.Println("iSCSI target already removed, trying to remove backstore...")
+		} else {
+			return fmt.Errorf("failed to delete iSCSI target: %s %s", err, out)
+		}
 	}
 
 	// Delete backstore
 	iscsidel = exec.Command("sudo", "targetcli", fmt.Sprintf("backstores/block delete name=%s", volumeName))
 	out, err = iscsidel.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("failed to delete backstore: %s %s", err, out)
+		if strings.HasPrefix(string(out), "No storage object named") {
+			fmt.Println("iSCSI backstore already removed.")
+		} else {
+			return fmt.Errorf("failed to delete backstore: %s %s", err, out)
+		}
 	}
 
 	return nil

@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -76,9 +77,13 @@ func deleteVolumeHandler(w http.ResponseWriter, r *http.Request) {
 	lvRemoveCmd := exec.Command("sudo", "lvremove", "-y", fmt.Sprintf("%s/%s", config.VGName, volumeName))
 	out, err := lvRemoveCmd.CombinedOutput()
 	if err != nil {
-		log.Printf("lvremove error: %v\n%s", err, out)
-		http.Error(w, "LVM delete failed", http.StatusInternalServerError)
-		return
+		if strings.HasPrefix(string(out), "Failed to find logical volume") {
+			log.Printf("logical volume already removed!")
+		} else {
+			log.Printf("lvremove error: %v %s", err, out)
+			http.Error(w, "LVM delete failed", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	log.Println("LVM volume deleted:", req.VolumeID)
