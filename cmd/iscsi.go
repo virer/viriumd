@@ -9,7 +9,7 @@ import (
 
 func createISCSITarget(volumeID string, volumeName string, volumeInitiator string) ([]byte, error) {
 	vgPath := fmt.Sprintf("/dev/%s/%s", config.VGName, volumeName)
-	log.Println("iSCSI configuration for", volumeName)
+	log.Println("iSCSI configuration for", volumeID)
 
 	iqn := fmt.Sprintf("%s:%s", config.Base_iqn, volumeID)
 
@@ -20,7 +20,7 @@ func createISCSITarget(volumeID string, volumeName string, volumeInitiator strin
 		return nil, fmt.Errorf("failed to create backstore: %s %s", err, out)
 	}
 
-	log.Println("iSCSI backstore created: ", volumeName)
+	// log.Println("iSCSI backstore created: ", volumeName)
 
 	// Create target
 	iscsicreate = exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/ create %s", iqn))
@@ -29,7 +29,7 @@ func createISCSITarget(volumeID string, volumeName string, volumeInitiator strin
 		return nil, fmt.Errorf("failed to create iSCSI target: %s %s", err, out)
 	}
 
-	log.Println("iSCSI target created: ", volumeName)
+	// log.Println("iSCSI target created: ", volumeName)
 
 	// Create LUN
 	iscsicreate = exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/%s/tpg1/luns/ create /backstores/block/%s", iqn, volumeName))
@@ -38,7 +38,7 @@ func createISCSITarget(volumeID string, volumeName string, volumeInitiator strin
 		return nil, fmt.Errorf("failed to create LUN: %s %s", err, out)
 	}
 
-	log.Println("iSCSI lun created: ", volumeName)
+	// log.Println("iSCSI lun created: ", volumeName)
 	// Attribute
 	iscsicreate = exec.Command("sudo", "targetcli", fmt.Sprintf("iscsi/%s/tpg1/", iqn), "set", "attribute", "generate_node_acls=1")
 	out, err = iscsicreate.CombinedOutput()
@@ -58,7 +58,7 @@ func createISCSITarget(volumeID string, volumeName string, volumeInitiator strin
 	if err != nil {
 		return nil, fmt.Errorf("failed to create ACL: %s %s", err, out)
 	}
-	log.Println("iSCSI configuration done for: ", volumeName)
+	log.Println("iSCSI configuration done for:", volumeID)
 
 	return []byte(iqn), nil
 }

@@ -10,10 +10,12 @@ type VolumeResizeRequest struct {
 }
 
 type VolumeResponse struct {
-	VolumeID     string `json:"volume_id"`
-	TargetPortal string `json:"targetPortal"`
-	Iqn          string `json:"iqn"`
-	Lun          string `json:"lun"`
+	VolumeID          string `json:"volume_id"`
+	TargetPortal      string `json:"targetPortal"`
+	Iqn               string `json:"iqn"`
+	Lun               string `json:"lun"`
+	DiscoveryCHAPAuth string `json:"discoveryCHAPAuth"`
+	SessionCHAPAuth   string `json:"sessionCHAPAuth"`
 }
 
 type DeleteVolumeRequest struct {

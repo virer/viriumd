@@ -27,7 +27,7 @@ func createVolumeHandler(w http.ResponseWriter, r *http.Request) {
 	volumeID := uuid.New().String()
 	volumeName := "virium-vol-" + volumeID
 
-	log.Printf("Creating %d MiB volumeID: %s in volumeGroup %s", lvmsize, volumeName, config.VGName)
+	log.Printf("Creating %d MiB volumeID: %s in volumeGroup %s", lvmsize, volumeID, config.VGName)
 
 	// LVM: Create logical volume
 	lvCreateCmd := exec.Command("sudo", "lvcreate", "-T", "-L", fmt.Sprintf("%dM", lvmsize), "-n", volumeName, config.VGName)
@@ -47,7 +47,14 @@ func createVolumeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(VolumeResponse{VolumeID: volumeID, TargetPortal: config.TargetPortal, Iqn: string(iqn), Lun: "0"})
+	json.NewEncoder(w).Encode(VolumeResponse{
+		VolumeID:          volumeID,
+		TargetPortal:      config.TargetPortal,
+		Iqn:               string(iqn),
+		Lun:               "0",
+		DiscoveryCHAPAuth: "true",
+		SessionCHAPAuth:   "false",
+	})
 }
 
 func deleteVolumeHandler(w http.ResponseWriter, r *http.Request) {
@@ -77,16 +84,17 @@ func deleteVolumeHandler(w http.ResponseWriter, r *http.Request) {
 	lvRemoveCmd := exec.Command("sudo", "lvremove", "-y", fmt.Sprintf("%s/%s", config.VGName, volumeName))
 	out, err := lvRemoveCmd.CombinedOutput()
 	if err != nil {
-		if strings.HasPrefix(string(out), "Failed to find logical volume") {
+		if strings.HasPrefix(string(out), "  Failed to find logical volume") {
 			log.Printf("logical volume already removed!")
 		} else {
-			log.Printf("lvremove error: %v %s", err, out)
+			log.Printf("lvremove error: %v -%s-", err, out)
 			http.Error(w, "LVM delete failed", http.StatusInternalServerError)
 			return
 		}
+	} else {
+		log.Println("LVM volume deleted:", req.VolumeID)
 	}
 
-	log.Println("LVM volume deleted:", req.VolumeID)
 	w.WriteHeader(http.StatusNoContent)
 }
 
