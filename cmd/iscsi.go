@@ -47,7 +47,7 @@ func deleteISCSITarget(volumeID, volumeName string) error {
 	out, err := iscsidel.CombinedOutput()
 	if err != nil {
 		if strings.HasPrefix(string(out), "No such Target in configfs") {
-			fmt.Println("iSCSI target already removed, trying to remove backstore...")
+			klog.V(2).Info("iSCSI target already removed, trying to remove backstore...")
 		} else {
 			return fmt.Errorf("failed to delete iSCSI target: %s %s", err, out)
 		}
@@ -58,7 +58,7 @@ func deleteISCSITarget(volumeID, volumeName string) error {
 	out, err = iscsidel.CombinedOutput()
 	if err != nil {
 		if strings.HasPrefix(string(out), "No storage object named") {
-			fmt.Println("iSCSI backstore already removed.")
+			klog.V(2).Info("iSCSI backstore already removed.")
 		} else {
 			return fmt.Errorf("failed to delete backstore: %s %s", err, out)
 		}
