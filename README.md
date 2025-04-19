@@ -26,10 +26,12 @@ $ sed -i 's/\(.*\)# snapshot_autoextend_threshold = 70/\1snapshot_autoextend_thr
 ### Create volume
 $ curl -X POST http://localhost:8787/api/volumes/create \
   -H "Content-Type: application/json" \
+  -u "virium_api_username:virium_api_password" \
   -d '{"initiator_name":"iqn.2025-04.net.virer.virium.test","capacity":10737418240}' # 10 GiB
 
 # Delete volume
 $ curl -X DELETE http://localhost:8787/api/volumes/delete \
     -H "Content-Type: application/json" \
+    -u "virium_api_username:virium_api_password" \
     -d '{"id":"47eb27cd-6824-4977-90fc-c62a21b11dfb"}'
 
