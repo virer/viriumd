@@ -16,7 +16,7 @@ $ CGO_ENABLED=0 GOOS=linux go build -o tmp/viriumd
 
 ## Usage:
 
-$ ./viriumd /path/to/config/file
+$ ./viriumd -v=2
 
 ## Example
 
