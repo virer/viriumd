@@ -37,7 +37,7 @@ func main() {
 		config.Base_iqn = "iqn.2025-04.net.virer.virium"
 	}
 	if config.TargetPortal == "" {
-		config.Base_iqn = "iqn.2025-04.net.virer.virium"
+		config.TargetPortal = "127.0.0.1:3260"
 	}
 	log.Printf("Starting virium on port %s using vol:%s (%s)", config.Port, config.VGName, version)
 
