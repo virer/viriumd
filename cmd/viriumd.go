@@ -3,13 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"regexp"
+
+	klog "k8s.io/klog/v2"
 )
 
 var config Config
-var version string = "v0.1.3.4"
+var version string = "v0.2.0"
 var validNamePattern = regexp.MustCompile(`^[a-zA-Z0-9.:-]+$`)
 
 func isValidInput(s string) bool {
@@ -17,15 +18,18 @@ func isValidInput(s string) bool {
 }
 
 func main() {
-	var err error
+	klog.InitFlags(nil)
+	flag.Set("logtostderr", "true")
+	flag.Set("v", "1")
 	configPath := flag.String("config", "/etc/virium/virium.yaml", "Path to configuration file")
 	flag.Parse()
 
+	var err error
 	config, err = LoadConfigFromFile(*configPath)
 	if err != nil {
-		log.Fatalf("Failed to load config: %v", err)
+		klog.Fatalf("Failed to load config: %v", err)
 	}
-	// fmt.Printf("Config loaded: %+v\n", config)
+	klog.V(2).Infof("Config loaded: %+v\n", config)
 
 	if config.VGName == "" {
 		config.VGName = "vg_data"
@@ -39,7 +43,10 @@ func main() {
 	if config.TargetPortal == "" {
 		config.TargetPortal = "127.0.0.1:3260"
 	}
-	log.Printf("Starting virium on port %s using vol:%s (%s)", config.Port, config.VGName, version)
+	if config.Cmd_prefix == "" {
+		config.Cmd_prefix = "sudo"
+	}
+	klog.V(1).Infof("Starting virium on port %s using vol:%s (%s)", config.Port, config.VGName, version)
 
 	http.HandleFunc("/api/volumes/create", createVolumeHandler)
 	http.HandleFunc("/api/volumes/delete", deleteVolumeHandler)

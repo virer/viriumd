@@ -3,12 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os/exec"
 	"strings"
 
 	"github.com/google/uuid"
+	klog "k8s.io/klog/v2"
 )
 
 func createVolumeHandler(w http.ResponseWriter, r *http.Request) {
@@ -27,21 +27,21 @@ func createVolumeHandler(w http.ResponseWriter, r *http.Request) {
 	volumeID := uuid.New().String()
 	volumeName := "virium-vol-" + volumeID
 
-	log.Printf("Creating %d MiB volumeID: %s in volumeGroup %s", lvmsize, volumeID, config.VGName)
+	klog.V(1).Infof("Creating %d MiB volumeID: %s in volumeGroup %s", lvmsize, volumeID, config.VGName)
 
 	// LVM: Create logical volume
 	lvCreateCmd := exec.Command("sudo", "lvcreate", "-T", "-L", fmt.Sprintf("%dM", lvmsize), "-n", volumeName, config.VGName)
 	out, err := lvCreateCmd.CombinedOutput()
 	if err != nil {
-		log.Printf("lvcreate error: %v\n%s", err, out)
+		klog.V(2).Infof("lvcreate error: %v\n%s", err, out)
 		http.Error(w, "LVM create failed", http.StatusInternalServerError)
 		return
 	}
-	log.Println("LVM volume created:", volumeName)
+	klog.V(2).Info("LVM volume created:", volumeName)
 
 	iqn, err := createISCSITarget(volumeID, volumeName, req.InitiatorName)
 	if err != nil {
-		log.Printf("iSCSI error: %s", err)
+		klog.Error("iSCSI error:", err)
 		http.Error(w, "iSCSI error", http.StatusInternalServerError)
 		return
 	}
@@ -70,12 +70,12 @@ func deleteVolumeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	volumeName := "virium-vol-" + req.VolumeID
-	log.Printf("Removing volumeID: %s in volumeGroup %s", volumeName, config.VGName)
+	klog.V(2).Infof("Removing volumeID: %s in volumeGroup %s", volumeName, config.VGName)
 
 	// Remove iSCSI export first
 	err := deleteISCSITarget(req.VolumeID, volumeName)
 	if err != nil {
-		log.Printf("iSCSI error: %s", err)
+		klog.Error("iSCSI error:", err)
 		http.Error(w, "iSCSI error", http.StatusInternalServerError)
 		return
 	}
@@ -85,14 +85,14 @@ func deleteVolumeHandler(w http.ResponseWriter, r *http.Request) {
 	out, err := lvRemoveCmd.CombinedOutput()
 	if err != nil {
 		if strings.HasPrefix(string(out), "  Failed to find logical volume") {
-			log.Printf("logical volume already removed!")
+			klog.V(2).Info("logical volume already removed!")
 		} else {
-			log.Printf("lvremove error: %v -%s-", err, out)
+			klog.Error("lvremove error", err, out)
 			http.Error(w, "LVM delete failed", http.StatusInternalServerError)
 			return
 		}
 	} else {
-		log.Println("LVM volume deleted:", req.VolumeID)
+		klog.V(2).Info("LVM volume deleted:", req.VolumeID)
 	}
 
 	w.WriteHeader(http.StatusNoContent)
@@ -114,17 +114,17 @@ func resizeVolumeHandler(w http.ResponseWriter, r *http.Request) {
 	volumeID := req.VolumeID
 	volumeName := "virium-vol-" + volumeID
 
-	log.Printf("Extending %d MiB volumeID: %s in volumeGroup %s", lvmsize, volumeName, config.VGName)
+	klog.V(1).Infof("Extending %d MiB volumeID: %s in volumeGroup %s", lvmsize, volumeName, config.VGName)
 
 	// LVM: Create logical volume
 	lvCreateCmd := exec.Command("sudo", "lvextend", "-L", fmt.Sprintf("%dM", lvmsize), "-n", fmt.Sprintf("%s/%s", config.VGName, volumeName))
 	out, err := lvCreateCmd.CombinedOutput()
 	if err != nil {
-		log.Printf("lvextend error: %v\n%s", err, out)
+		klog.Error("lvextend error:", err, out)
 		http.Error(w, "LVM extend failed", http.StatusInternalServerError)
 		return
 	}
-	log.Println("LVM volume extended:", volumeName)
+	klog.V(2).Info("LVM volume extended:", volumeName)
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(VolumeResponse{VolumeID: volumeID})

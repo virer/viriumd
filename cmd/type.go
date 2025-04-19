@@ -35,4 +35,5 @@ type Config struct {
 	Port         string `yaml:"port"`
 	Base_iqn     string `yaml:"iqn"`
 	TargetPortal string `yaml:"target_portal"`
+	Cmd_prefix   string `yaml:"cmd_prefix"`
 }
