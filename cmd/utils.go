@@ -7,23 +7,30 @@ import (
 	"strings"
 
 	"gopkg.in/yaml.v3"
+	"k8s.io/klog/v2"
 )
 
-func LoadConfigFromFile(filename string) (Config, error) {
-	var cfg Config
+func LoadConfigFromFile(filename string) error {
+	once.Do(func() {
+		// Load default config first
+		config = NewConfiguration()
 
-	file, err := os.Open(filename)
-	if err != nil {
-		return cfg, fmt.Errorf("open config file: %w", err)
-	}
-	defer file.Close()
+		// Open the YaML config file
+		file, err := os.Open(filename)
+		if err != nil {
+			klog.Error("open config file: %w", err)
+			return
+		}
+		defer file.Close()
 
-	decoder := yaml.NewDecoder(file)
-	if err := decoder.Decode(&cfg); err != nil {
-		return cfg, fmt.Errorf("decode config: %w", err)
-	}
-
-	return cfg, nil
+		// Unmarshal the file content into the config struct
+		decoder := yaml.NewDecoder(file)
+		if err := decoder.Decode(&config); err != nil {
+			klog.Error("decode config: %w", err)
+			return
+		}
+	})
+	return nil
 }
 
 func executeWrapper(commandline string, errmsg string) ([]byte, error) {

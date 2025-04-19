@@ -36,4 +36,19 @@ type Config struct {
 	Base_iqn     string `yaml:"iqn"`
 	TargetPortal string `yaml:"target_portal"`
 	Cmd_prefix   string `yaml:"cmd_prefix"`
+	API_username string `yaml:"api_username"`
+	API_password string `yaml:"api_password"`
+}
+
+// Constructor function that sets default values
+func NewConfiguration() *Config {
+	return &Config{
+		VGName:       "vg_data",                      // Default LVM Volume Group is vg_data
+		Port:         "8787",                         // Default http port is 8787
+		Base_iqn:     "iqn.2025-04.net.virer.virium", // Default iSCSI iqn is iqn.2025-04.net.virer.virium
+		TargetPortal: "127.0.0.1:3260",               // Default target portal is localhost:3260
+		Cmd_prefix:   "sudo",                         // Default command prefix is sudo
+		API_username: "virium_api_username",          // Default API username is virium_api_username
+		API_password: "virium_api_password",          // Default API password is virium_api_password
+	}
 }
