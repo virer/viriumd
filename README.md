@@ -12,7 +12,7 @@ The existing kubernetes external block storage solution was too complex to set u
 This is not a production ready solution and not intented to be (at least in the first steps).
 
 ## Build
-$ CGO_ENABLED=0 GOOS=linux go build -o tmp/viriumd
+$ CGO_ENABLED=0 GOOS=linux go build -o bin/viriumd
 
 ## Usage:
 
