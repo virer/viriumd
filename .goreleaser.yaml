@@ -3,4 +3,4 @@ builds:
     main: ./cmd/viriumd
     binary: viriumd
     goos: 
-      linux
+      - linux
