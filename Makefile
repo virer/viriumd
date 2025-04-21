@@ -7,4 +7,4 @@ mod-check:
 
 
 all:
-	cd cmd; CGO_ENABLED=0 GOOS=linux go build -o ../bin/viriumd 
+	CGO_ENABLED=0 GOOS=linux go build -o ../bin/viriumd ./cmd/viriumd

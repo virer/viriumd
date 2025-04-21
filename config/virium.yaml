@@ -1,6 +1,6 @@
 vg_name: "vg_data"
 port: "8787"
 iqn: "iqn.2025-04.net.virer.virium"
-target_portal: "100.100.0.147:3260"
+target_portal: "192.168.0.147:3260"
 api_username: "virium_api_username"
 api_password: "virium_api_password"

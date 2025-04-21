@@ -11,17 +11,20 @@ The existing kubernetes external block storage solution was too complex to set u
 
 This is not a production ready solution and not intented to be (at least in the first steps).
 
-## Build
-$ CGO_ENABLED=0 GOOS=linux go build -o bin/viriumd
+## Requierements
 
-## Usage:
+Firewall:
+ open TCP port 8787 (default customizable port)
+
+
+## Build
+$ ./buid.sh
+
+## Usage
 
 $ ./viriumd -v=2
 
 ## Example
-
-### Configure LVM
-$ sed -i 's/\(.*\)# snapshot_autoextend_threshold = 70/\1snapshot_autoextend_threshold = 70/g' /etc/lvm/lvm.conf 
 
 ### Create volume
 $ curl -X POST http://localhost:8787/api/volumes/create \
@@ -29,9 +32,9 @@ $ curl -X POST http://localhost:8787/api/volumes/create \
   -u "virium_api_username:virium_api_password" \
   -d '{"initiator_name":"iqn.2025-04.net.virer.virium.test","capacity":10737418240}' # 10 GiB
 
-# Delete volume
+### Delete volume
 $ curl -X DELETE http://localhost:8787/api/volumes/delete \
     -H "Content-Type: application/json" \
     -u "virium_api_username:virium_api_password" \
-    -d '{"id":"47eb27cd-6824-4977-90fc-c62a21b11dfb"}'
+    -d '{"volume_id":"47eb27cd-6824-4977-90fc-c62a21b11dfb"}'
 

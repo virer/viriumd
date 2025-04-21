@@ -1,0 +1,12 @@
+[Unit]
+Description=Viriumd - CSI API server for LVM/iSCSI
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/viriumd -config /etc/viriumd/config.yaml
+Restart=on-failure
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
