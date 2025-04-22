@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os/exec"
 
-	"github.com/google/uuid"
 	klog "k8s.io/klog/v2"
 )
 
@@ -18,16 +17,16 @@ func createSnapshotHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !isValidInput(req.VolumeID) {
-		http.Error(w, "invalid initiator name format", http.StatusBadRequest)
+		klog.V(5).Info("invalid source volume id", req)
+		http.Error(w, "invalid source volume id format", http.StatusBadRequest)
 		return
 	}
 
-	snapshotID := uuid.New().String()
 	volumeName := "virium-vol-" + req.VolumeID
-	snapshotName := "virium-snap-" + snapshotID
+	snapshotName := "virium-snap-" + req.Name
 	volumeGroup := config.VGName
 
-	klog.V(2).Infof("Creating snapshot ref: %s for vol: %s in volumeGroup %s", snapshotID, volumeName, volumeGroup)
+	klog.V(2).Infof("Creating snapshot ref: %s for vol: %s in volumeGroup %s", snapshotName, volumeName, volumeGroup)
 
 	// LVM: Create snapshot
 	lvCreateCmd := exec.Command("sudo", "lvcreate", "-s", "--size", "8M", "-n", snapshotName, fmt.Sprintf("/dev/%s/%s", volumeGroup, volumeName))
@@ -40,7 +39,7 @@ func createSnapshotHandler(w http.ResponseWriter, r *http.Request) {
 	klog.V(2).Info("LVM snapshot created:", req.VolumeID)
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(SnapshotRequest{VolumeID: snapshotID})
+	json.NewEncoder(w).Encode(SnapshotRequest{VolumeID: snapshotName})
 }
 
 func deleteSnapshotHandler(w http.ResponseWriter, r *http.Request) {

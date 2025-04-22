@@ -4,21 +4,14 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"regexp"
-	"sync"
 
 	klog "k8s.io/klog/v2"
 )
 
-var config *Config
+var config *Config = NewConfiguration()
 var version string = "v0.2.0"
 
-var once sync.Once // Ensure the config is loaded only once
-var validNamePattern = regexp.MustCompile(`^[a-zA-Z0-9.:-]+$`)
-
-func isValidInput(s string) bool {
-	return validNamePattern.MatchString(s)
-}
+// var once sync.Once // Ensure the config is loaded only once
 
 func main() {
 	klog.InitFlags(nil)
@@ -27,12 +20,7 @@ func main() {
 	configPath := flag.String("config", "/etc/virium/virium.yaml", "Path to configuration file")
 	flag.Parse()
 
-	var err error
-	config := NewConfiguration() // Loading default validation
-	err = LoadConfigFromFile(*configPath)
-	if err != nil {
-		klog.Fatalf("Failed to load config: %v", err)
-	}
+	LoadFromFile(*configPath)
 	klog.V(5).Infof("Config loaded: %+v\n", config)
 
 	// Create a new mux router

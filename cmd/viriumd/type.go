@@ -23,7 +23,8 @@ type DeleteVolumeRequest struct {
 }
 
 type SnapshotRequest struct {
-	VolumeID string `json:"snapshot_id"`
+	Name     string `json:"name"`
+	VolumeID string `json:"source_volume_id"`
 }
 
 type DeleteSnapshotRequest struct {

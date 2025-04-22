@@ -30,7 +30,7 @@ func createVolumeHandler(w http.ResponseWriter, r *http.Request) {
 	klog.V(1).Infof("Creating %d MiB volumeID: %s in volumeGroup %s", lvmsize, volumeID, config.VGName)
 
 	// LVM: Create logical volume
-	lvCreateCmd := exec.Command("sudo", "lvcreate", "-T", "-L", fmt.Sprintf("%dM", lvmsize), "-n", volumeName, config.VGName)
+	lvCreateCmd := exec.Command("sudo", "lvcreate", "-L", fmt.Sprintf("%dM", lvmsize), "-n", volumeName, config.VGName)
 	out, err := lvCreateCmd.CombinedOutput()
 	if err != nil {
 		klog.V(2).Infof("lvcreate error: %v\n%s", err, out)
