@@ -42,8 +42,8 @@ func main() {
 	mux.Handle("/api/volumes/delete", basicAuthMiddleware(http.HandlerFunc(deleteVolumeHandler)))
 	mux.Handle("/api/volumes/resize", basicAuthMiddleware(http.HandlerFunc(resizeVolumeHandler)))
 
-	mux.Handle("/api/snapshoft/create", basicAuthMiddleware(http.HandlerFunc(createSnapshotHandler)))
-	mux.Handle("/api/snapshoft/delete", basicAuthMiddleware(http.HandlerFunc(deleteSnapshotHandler)))
+	mux.Handle("/api/snapshot/create", basicAuthMiddleware(http.HandlerFunc(createSnapshotHandler)))
+	mux.Handle("/api/snapshot/delete", basicAuthMiddleware(http.HandlerFunc(deleteSnapshotHandler)))
 
 	klog.V(1).Infof("Starting virium on port %s using vol:%s (%s)", config.Port, config.VGName, version)
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", config.Port), mux); err != nil {
