@@ -10,7 +10,7 @@ import (
 
 func createISCSITarget(volumeID string, volumeName string, volumeInitiator string) ([]byte, error) {
 	vgPath := fmt.Sprintf("/dev/%s/%s", config.VGName, volumeName)
-	klog.V(2).Info("iSCSI configuration for", volumeID)
+	klog.V(2).Info("iSCSI configuration for: ", volumeID)
 
 	iqn := fmt.Sprintf("%s:%s", config.Base_iqn, volumeID)
 
@@ -34,7 +34,7 @@ func createISCSITarget(volumeID string, volumeName string, volumeInitiator strin
 		}
 	}
 
-	klog.V(2).Info("iSCSI configuration done for:", volumeID)
+	klog.V(2).Info("iSCSI configuration done for: ", volumeID)
 
 	return []byte(iqn), nil
 }

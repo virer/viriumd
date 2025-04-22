@@ -1,9 +1,26 @@
 package main
 
+// Volume Request :
 type VolumeRequest struct {
-	InitiatorName string `json:"initiator_name"`
-	Capacity      int64  `json:"capacity"` // bytes
+	InitiatorName string               `json:"initiator_name"`
+	Capacity      int64                `json:"capacity"`                 // bytes
+	ContentSource *VolumeContentSource `json:"content_source,omitempty"` // Source to copy the data from when cloning
 }
+type VolumeContentSource struct {
+	Type struct {
+		Snapshot *SnapshotSource `json:"Snapshot,omitempty"`
+		Volume   *VolumeSource   `json:"Volume,omitempty"`
+	} `json:"Type"`
+}
+type SnapshotSource struct {
+	SnapshotID string `json:"snapshot_id"`
+}
+type VolumeSource struct {
+	VolumeID string `json:"volume_id"`
+}
+
+// Volume Request ^^
+
 type VolumeResizeRequest struct {
 	VolumeID string `json:"volume_id"`
 	Capacity int64  `json:"capacity"` // bytes
@@ -25,6 +42,12 @@ type DeleteVolumeRequest struct {
 type SnapshotRequest struct {
 	Name     string `json:"name"`
 	VolumeID string `json:"source_volume_id"`
+}
+
+type SnapshotResponse struct {
+	SnapshotId     string `json:"snapshot_id"`
+	SourceVolumeID string `json:"source_volume_id"`
+	Capacity       int64  `json:"capacity"` // bytes
 }
 
 type DeleteSnapshotRequest struct {
