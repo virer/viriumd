@@ -1,5 +1,5 @@
 Name:           viriumd
-Version:        0.2.8
+Version:        0.2.9
 Release:        1%{?dist}
 Summary:        Viriumd - CSI Storage API server using iSCSI and LVM
 
