@@ -110,6 +110,14 @@ curl -X DELETE http://localhost:8787/api/volumes/delete \
     -d '{"volume_id":"47eb27cd-6824-4977-90fc-c62a21b11dfb"}'
 ```
 
+## 🧹 Troubleshooting
+
+    No such VG: Ensure vg_name exists and is active.
+
+    iSCSI not working: Check targetcli configuration(targetli ls) and firewalls.
+
+    Permissions: The viriumd binary may require sudo to interact with LVM or iSCSI, or you can adjust the system permissions accordingly.
+
 ### ✨ Tips
 
 To avoid to saturate LVM snapshots, please configure LVM snapshot autoextend:
