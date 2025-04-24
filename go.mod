@@ -1,6 +1,6 @@
 module virer.net/virium
 
-go 1.23.7
+go 1.23.5
 
 require (
 	github.com/google/uuid v1.6.0
