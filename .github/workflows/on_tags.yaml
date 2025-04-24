@@ -34,7 +34,7 @@ jobs:
           with:
             files: |
               ${{ steps.rpm_build.outputs.source_rpm_path }}
-              ${{ steps.rpm.outputs.rpm_dir_path }}
+              ${{ steps.rpm.outputs.rpm_dir_path }}/viriumd-${{github.ref_name}}-1.el9.x86_64.rpm
 
 # **************************************************************************************************************
 #       Goreleaser 
