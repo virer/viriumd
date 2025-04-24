@@ -5,7 +5,7 @@ Summary:        Viriumd - CSI Storage API server using iSCSI and LVM
 
 License:        MIT
 URL:            https://github.com/virer/viriumd
-Source0:        viriumd-%{version}.tar.gz
+Source0:        https://github.com/virer/viriumd/viriumd-%{version}.tar.gz
 Source1:        viriumd.service
 Source2:        virium.yaml
 BuildArch:      x86_64
