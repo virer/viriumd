@@ -52,7 +52,7 @@ Please check "docs" directory
 
 ## Looking for the CSI Driver?
 
-Please check the [Helm charts here](https://github.com/virer/virium-helm-repo)
+Please check the [Helm charts here](https://github.com/virer/virium-helm-repo/tree/main)
 
 ## License
 
