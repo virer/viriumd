@@ -1,11 +1,11 @@
 Name:           viriumd
-Version:        0.1.0
+Version:        0.2.7
 Release:        1%{?dist}
 Summary:        Viriumd - CSI Storage API server using iSCSI and LVM
 
 License:        MIT
 URL:            https://github.com/virer/viriumd
-Source0:        viriumd-0.1.0.tar.gz
+Source0:        viriumd-%{version}.tar.gz
 Source1:        viriumd.service
 Source2:        config.yaml
 BuildArch:      x86_64
@@ -31,7 +31,7 @@ install -D -m 0644 %{SOURCE2} %{buildroot}/etc/viriumd/config.yaml
 
 %files
 %license LICENSE
-%doc README.md
+%doc docs/README.md
 /usr/bin/viriumd
 /etc/viriumd/config.yaml
 /usr/lib/systemd/system/viriumd.service
@@ -47,5 +47,8 @@ install -D -m 0644 %{SOURCE2} %{buildroot}/etc/viriumd/config.yaml
 %systemd_postun_with_restart viriumd.service
 
 %changelog
+* Thu Apr 24 2025 Sebastien Caps <virer@hotmail.com> - 0.2.7-1
+- Updated source version and change doc file
+
 * Sat Apr 19 2025 Sebastien Caps <virer@hotmail.com> - 0.1.0-1
 - Initial RPM release

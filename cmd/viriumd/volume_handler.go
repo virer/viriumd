@@ -104,8 +104,9 @@ func deleteVolumeHandler(w http.ResponseWriter, r *http.Request) {
 	err := deleteISCSITarget(req.VolumeID, volumeName)
 	if err != nil {
 		klog.Error("iSCSI error:", err)
-		http.Error(w, "iSCSI error", http.StatusInternalServerError)
-		return
+		// Don't throw error immerdialy, just try to do the cleanup
+		// http.Error(w, "iSCSI error", http.StatusInternalServerError)
+		// return
 	}
 
 	// LVM: Remove logical volume
@@ -116,7 +117,9 @@ func deleteVolumeHandler(w http.ResponseWriter, r *http.Request) {
 			klog.V(2).Info("logical volume already removed!")
 		} else {
 			klog.Error("lvremove error", err, out)
-			http.Error(w, "LVM delete failed", http.StatusInternalServerError)
+			// Don't throw error immerdialy, just try to do the cleanup
+			// http.Error(w, "LVM delete failed", http.StatusInternalServerError)
+			w.WriteHeader(http.StatusNoContent)
 			return
 		}
 	} else {

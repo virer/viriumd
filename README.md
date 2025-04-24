@@ -36,7 +36,7 @@ This project is **not production-ready** and is **not intended to be**, at least
 - Demo environments
 - Lightweight Kubernetes clusters with external CSI driver
 
-## Requierements
+## 🚀 Requirements
 
 Firewall:
  - open TCP port 8787 (default customizable port)
@@ -46,40 +46,10 @@ Packages:
  - targetcli
  - target-restore
 
-## Installation 
-```
-curl --output viriumd.tar.gz -L https://github.com/virer/viriumd/releases/download/v0.2.6/viriumd_0.2.6_linux_amd64.tar.gz
-tar -vzxf viriumd.tar.gz
-```
+## Docs, Installation and usage
 
-## Usage
+Please check "docs" directory
 
-```
-./viriumd -v=2
-```
+## License
 
-## Manual build
-
-```
-./scripts/buid.sh
-```
-
-## Example
-
-### Create volume
-
-```
-curl -X POST http://localhost:8787/api/volumes/create \
-  -H "Content-Type: application/json" \
-  -u "virium_api_username:virium_api_password" \
-  -d '{"initiator_name":"iqn.2025-04.net.virer.virium.test","capacity":10737418240}' # 10 GiB
-```
-
-### Delete volume
-
-```
-curl -X DELETE http://localhost:8787/api/volumes/delete \
-    -H "Content-Type: application/json" \
-    -u "virium_api_username:virium_api_password" \
-    -d '{"volume_id":"47eb27cd-6824-4977-90fc-c62a21b11dfb"}'
-```
+Viriumd is released under Apache License Version 2.0

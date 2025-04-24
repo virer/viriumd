@@ -59,8 +59,7 @@ func deleteSnapshotHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !isValidInput(req.VolumeID) {
-		w.WriteHeader(http.StatusNoContent)
-		// FIXME http.Error(w, "invalid ID format", http.StatusBadRequest)
+		http.Error(w, "invalid ID format", http.StatusBadRequest)
 		return
 	}
 	snapshotName := "virium-snap-" + req.VolumeID
@@ -71,7 +70,9 @@ func deleteSnapshotHandler(w http.ResponseWriter, r *http.Request) {
 	out, err := lvRemoveCmd.CombinedOutput()
 	if err != nil {
 		klog.Error("lvremove error", err, out)
-		http.Error(w, "LVM delete failed", http.StatusInternalServerError)
+		// Don't throw error immerdialy, just try to do the cleanup
+		// http.Error(w, "LVM delete failed", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
