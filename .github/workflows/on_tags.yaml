@@ -1,4 +1,4 @@
-name: goreleaser
+name: rpm+goreleaser
 
 on:
   push:
@@ -9,27 +9,6 @@ permissions:
   contents: write
 
 jobs:
-  goreleaser:
-    runs-on: ubuntu-latest
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      -
-        name: Set up Go
-        uses: actions/setup-go@v5
-      -
-        name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
-        with:
-          distribution: goreleaser
-          version: '~> v2'
-          args: release --clean
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 
   rpmbuilder:
         name: Create RPM Release (using ubuntu, what a strange way to build RPM)
@@ -71,3 +50,26 @@ jobs:
               asset_path: ${{ steps.rpm_build.outputs.source_rpm_path }}
               asset_name: ${{ steps.rpm_build.outputs.source_rpm_name }}
               asset_content_type: ${{ steps.rpm_build.outputs.rpm_content_type }}
+
+
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      -
+        name: Set up Go
+        uses: actions/setup-go@v5
+      -
+        name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
