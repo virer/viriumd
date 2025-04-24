@@ -8,7 +8,7 @@ import (
 )
 
 var config *Config = NewConfiguration()
-var version string = "v0.2.7"
+var version string = "v0.4.1"
 
 // var once sync.Once // Ensure the config is loaded only once
 
