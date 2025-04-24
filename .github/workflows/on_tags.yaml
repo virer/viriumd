@@ -32,11 +32,19 @@ jobs:
           uses: softprops/action-gh-release@v2
           if: github.ref_type == 'tag'
           with:
-            files: ${{ steps.rpm_build.outputs.source_rpm_path }}
+            files: |
+              ${{ steps.rpm_build.outputs.source_rpm_path }}
 
 # **************************************************************************************************************
 #       Goreleaser 
 # **************************************************************************************************************
+
+  goreleaser:
+        name: Create RPM Release (using ubuntu, what a strange way to build RPM)
+        runs-on: ubuntu-latest
+
+        steps:
+
         - name: Checkout
           uses: actions/checkout@v4
           with:
