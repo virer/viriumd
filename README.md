@@ -50,6 +50,10 @@ Packages:
 
 Please check "docs" directory
 
+## Looking for the CSI Driver?
+
+Please check the [Helm charts here](https://github.com/virer/virium-helm-repo)
+
 ## License
 
 Viriumd is released under Apache License Version 2.0
