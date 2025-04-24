@@ -52,7 +52,7 @@ Please check [docs](https://github.com/virer/viriumd/tree/main/docs) directory
 
 ## 📚 Looking for the CSI Driver?
 
-Please check the content of [Virium CSI Driver Controller](https://github.com/virer/virium-csi-drv-controller) repository for the CSI Driver documentation. Also, you may find the [Helm charts here](https://github.com/virer/virium-helm-repo/tree/main)
+Please check the content of [Virium CSI Driver Controller](https://github.com/virer/virium-csi-drv-controller) repository for the CSI Driver documentation and instruction for the Helm Charts.
 
 ## License
 
