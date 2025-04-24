@@ -18,9 +18,6 @@ Viriumd is an API server that manages LVM and iSCSI-based volumes for use with K
 
 %prep
 %setup 
-# -c -n viriumd
-ls
-ls *
 
 %build
 go build -o viriumd ./cmd/viriumd  
