@@ -20,13 +20,13 @@ jobs:
           uses: actions/checkout@master
 
         - name: Replace version in RPM spec so correct source is downloaded when building RPM
-          run: sed -Ei 's/(^Version:[[:space:]]*).*/\1${{github.ref_name}}/' scripts/rpmbuild/SPECS/viriumd.spec
+          run: sed -Ei 's/(^Version:[[:space:]]*).*/\1${{github.ref_name}}/' scripts/viriumd.spec
 
         - name: build RPM package
           id: rpm_build
           uses: naveenrajm7/rpmbuild@master
           with:
-              spec_file: "scripts/rpmbuild/SPECS/viriumd.spec"
+              spec_file: "scripts/viriumd.spec"
             
         - name: Upload Release Asset
           id: upload-release-asset 
