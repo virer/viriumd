@@ -143,3 +143,8 @@ To avoid to saturate LVM snapshots, please configure LVM snapshot autoextend:
 ```
 sed -i 's/\(.*\)# snapshot_autoextend_threshold = 70/\1snapshot_autoextend_threshold = 70/g' /etc/lvm/lvm.conf 
 ```
+
+## 📚 Looking for the CSI Driver?
+
+Please check the content of [Virium CSI Driver Controller](https://github.com/virer/virium-csi-drv-controller) repository for the CSI Driver documentation. Also, you may find the [Helm charts here](https://github.com/virer/virium-helm-repo/tree/main)
+
