@@ -34,6 +34,7 @@ jobs:
           with:
             files: |
               ${{ steps.rpm_build.outputs.source_rpm_path }}
+              ${{ steps.rpm.outputs.rpm_dir_path }}
 
 # **************************************************************************************************************
 #       Goreleaser 
