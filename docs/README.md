@@ -42,6 +42,9 @@ iqn: "iqn.2025-04.net.virer.virium"
 target_portal: "192.168.0.147:3260"
 api_username: "virium_api_username"
 api_password: "virium_api_password"
+tls_enabled: false
+tls_cert_file: "/etc/viriumd/tls/server.crt"
+tls_key_file: "/etc/viriumd/tls/server.key"
 
 🔐 Parameters Explained
 Name	Description
@@ -51,12 +54,28 @@ iqn	The iSCSI qualified name for your target
 target_portal	IP address and port where the iSCSI target is exposed (so most probably the same IP where you deployed Viriumd)
 api_username	Basic authentication username for API access
 api_password	Basic authentication password for API access
+tls_enabled     Activate TLS support
+tls_cert_file   Public key TLS certificate
+tls_key_file    Private key TLS certificate
+
+## ✅ 3. Generate a self-signed cert (for testing)
+
+If you don’t have a TLS cert yet:
+
+```
+mkdir -p /etc/viriumd/tls
+
+openssl req -x509 -newkey rsa:4096 -nodes -keyout /etc/viriumd/tls/server.key \
+  -out /etc/viriumd/tls/server.crt -days 365 -subj "/CN=viriumd"
+```
 
 ## 🧪 Running the API
 
 After configuration, you can start viriumd manually:
 
+```
 ./viriumd -config /etc/viriumd/virium.yaml
+```
 
 Or enable it as a service (unit file in this repo: scripts/rpmbuild/SOURCE/viriumd.service):
 

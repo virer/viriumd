@@ -62,6 +62,9 @@ type Config struct {
 	Cmd_prefix   string `yaml:"cmd_prefix"`
 	API_username string `yaml:"api_username"`
 	API_password string `yaml:"api_password"`
+	TLSEnabled   bool   `yaml:"tls_enabled"`
+	TLSCertFile  string `yaml:"tls_cert_file"`
+	TLSKeyFile   string `yaml:"tls_key_file"`
 }
 
 // Constructor function that sets default values
