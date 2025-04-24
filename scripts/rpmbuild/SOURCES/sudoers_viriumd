@@ -1,0 +1,3 @@
+Cmnd_Alias STORAGE = /usr/sbin/lvcreate, /usr/sbin/lvremove, /usr/bin/targetcli, /usr/bin/targetctl, /usr/bin/dd
+
+viriumd  ALL=(root)       NOPASSWD: STORAGE
