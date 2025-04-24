@@ -17,7 +17,7 @@ Requires:       lvm2
 Viriumd is an API server that manages LVM and iSCSI-based volumes for use with Kubernetes CSI drivers. It exposes a RESTful API for volume creation, deletion, and snapshots.
 
 %prep
-%setup 
+%setup -q
 
 %build
 go build -o viriumd ./cmd/viriumd  
